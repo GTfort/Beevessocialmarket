@@ -5,7 +5,7 @@ class Router {
       "/register": "/pages/register.html",
       "/login": "/pages/login.html",
       "/dashboard": "/pages/dashboard.html",
-      "/profile": "/pages/dashboard.html", // Will need to create these pages later
+      "/profile": "/pages/profile.html", // Will need to create these pages later
       "/history": "/pages/dashboard.html", // Will need to create these pages later
     };
     this.components = {
