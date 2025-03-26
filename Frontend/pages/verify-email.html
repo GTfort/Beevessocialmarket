@@ -1,0 +1,44 @@
+<div class="page min-h-screen flex">
+  <div class="flex-1 flex items-center justify-center px-4 py-12">
+    <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+      <h1 class="text-2xl font-bold text-gray-900 mb-4">Email Verification</h1>
+      <p id="verification-message" class="text-gray-600">
+        Verifying your email...
+      </p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { apiUrl } from "../src/auth/config.js";
+
+  async function verifyEmail() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (!token) {
+      document.getElementById("verification-message").textContent =
+        "Invalid verification link";
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/auth/verify-email/${token}`);
+      const data = await response.json();
+
+      if (data.success) {
+        document.getElementById("verification-message").textContent =
+          "Email verified successfully! Redirecting to login...";
+        setTimeout(() => (window.location.href = "/login"), 2000);
+      } else {
+        document.getElementById("verification-message").textContent =
+          data.message;
+      }
+    } catch (error) {
+      document.getElementById("verification-message").textContent =
+        "Verification failed. Please try again.";
+    }
+  }
+
+  verifyEmail();
+</script>

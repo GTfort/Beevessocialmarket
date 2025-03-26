@@ -50,3 +50,14 @@ footer {
 .page.active {
   display: block;
 }
+/* Add these transitions for smooth hover effects */
+.transition {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Error message styles */
+#login-error {
+  transition: all 0.3s ease;
+}

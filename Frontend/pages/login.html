@@ -8,10 +8,18 @@
         <p class="mt-2 text-gray-600">Please sign in to your account</p>
       </div>
 
-      <form class="mt-8 space-y-6">
+      <!-- Error message container -->
+      <div
+        id="login-error"
+        class="hidden mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded"
+      ></div>
+
+      <form id="login-form" class="mt-8 space-y-6">
         <div class="space-y-4">
           <div>
             <input
+              id="email"
+              name="email"
               type="email"
               placeholder="Email"
               required
@@ -20,6 +28,8 @@
           </div>
           <div>
             <input
+              id="password"
+              name="password"
               type="password"
               placeholder="Password"
               required
@@ -31,19 +41,25 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center">
             <input
+              id="remember-me"
+              name="remember-me"
               type="checkbox"
               class="h-4 w-4 text-blue-600 border-gray-300 rounded"
             />
-            <label class="ml-2 text-sm text-gray-600">Remember me</label>
+            <label for="remember-me" class="ml-2 text-sm text-gray-600"
+              >Remember me</label
+            >
           </div>
-          <a href="#" class="text-sm text-blue-600 hover:text-blue-500"
+          <a
+            href="/forgot-password"
+            class="text-sm text-blue-600 hover:text-blue-500"
             >Forgot password?</a
           >
         </div>
 
         <button
           type="submit"
-          class="w-full py-2 px-4 bg-gray-800 hover:bg-gray-700 text-white rounded-md"
+          class="w-full py-2 px-4 bg-gray-800 hover:bg-gray-700 text-white rounded-md transition duration-150 ease-in-out"
         >
           Sign In
         </button>
@@ -59,10 +75,11 @@
 
         <button
           type="button"
-          class="w-full py-2 px-4 border border-gray-300 rounded-md flex items-center justify-center space-x-2 hover:bg-gray-50"
+          id="google-signin"
+          class="w-full py-2 px-4 border border-gray-300 rounded-md flex items-center justify-center space-x-2 hover:bg-gray-50 transition duration-150 ease-in-out"
         >
           <img
-            src="../assets/icons/icons8-google-48.png"
+            src="/assets/icons/icons8-google-48.png"
             alt="Google"
             class="h-5 w-5"
           />
@@ -70,14 +87,79 @@
         </button>
       </form>
 
-      <p class="text-center text-sm text-gray-600">
+      <p class="text-center text-sm text-gray-600 mt-4">
         Don't have an account?
         <a
           href="/register"
-          class="font-medium text-blue-600 hover:text-blue-500"
+          class="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out"
           >Sign up</a
         >
       </p>
     </div>
   </div>
 </div>
+
+<script>
+  // This script will be automatically executed when the login page loads
+  document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById("login-form");
+    const errorContainer = document.getElementById("login-error");
+    const googleSignIn = document.getElementById("google-signin");
+
+    if (loginForm) {
+      loginForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        // Disable submit button during processing
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = "Signing in...";
+
+        // Clear previous errors
+        errorContainer.classList.add("hidden");
+        errorContainer.textContent = "";
+
+        const formData = {
+          email: loginForm.email.value,
+          password: loginForm.password.value,
+          remember: loginForm["remember-me"].checked,
+        };
+
+        try {
+          const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+            credentials: "include", // Important for cookies
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "Login failed. Please try again.");
+          }
+
+          // Successful login - redirect to dashboard
+          window.location.href = "/dashboard";
+        } catch (error) {
+          // Show error message
+          errorContainer.textContent = error.message;
+          errorContainer.classList.remove("hidden");
+
+          // Re-enable submit button
+          submitButton.disabled = false;
+          submitButton.innerHTML = "Sign In";
+        }
+      });
+    }
+
+    if (googleSignIn) {
+      googleSignIn.addEventListener("click", function () {
+        // Implement Google OAuth flow here
+        window.location.href = "/auth/google"; // Your backend Google auth endpoint
+      });
+    }
+  });
+</script>
