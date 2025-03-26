@@ -288,3 +288,31 @@ class Router {
 document.addEventListener("DOMContentLoaded", () => {
   new Router();
 });
+
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Logging in...";
+
+  const response = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: e.target.email.value,
+      password: e.target.password.value,
+    }),
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    window.location.href = data.redirect; // Redirects to dashboard
+  } else {
+    alert(data.error || "Login failed");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Sign In";
+  }
+});
